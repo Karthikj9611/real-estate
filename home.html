@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dream Homes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <style>
+    .card:hover {
+      transform: translateY(-4px);
+      transition: transform 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+
+  <!-- Navbar -->
+  <nav class="bg-blue-700 text-white p-4 flex justify-between items-center">
+    <h1 class="text-xl font-bold">Dream Homes</h1>
+    <div class="space-x-4">
+      <a href="#listings" class="hover:underline">Listings</a>
+      <a href="#contact" class="hover:underline">Contact</a>
+      <a href="#about" class="hover:underline">About Us</a>
+      <button onclick="openProfileModal()" class="hover:underline">Profile</button>
+      <a href="logout.html" class="bg-red-500 px-3 py-1 rounded">Logout</a>
+    </div>
+  </nav>
+
+  <!-- Filters -->
+  <section class="p-4 flex flex-wrap justify-end space-x-4 items-center">
+    <select id="filter" class="border px-3 py-2 rounded" onchange="renderProperties()">
+      <option value="all">All BHK</option>
+      <option value="2BHK">2BHK</option>
+      <option value="3BHK">3BHK</option>
+      <option value="4BHK">4BHK</option>
+      <option value="5BHK">5BHK</option>
+    </select>
+    <select id="priceFilter" class="border px-3 py-2 rounded" onchange="renderProperties()">
+      <option value="all">All Prices</option>
+      <option value="0-10000">Below ₹10K</option>
+      <option value="10000-20000">₹10K – ₹20K</option>
+      <option value="20000-30000">₹20K – ₹30K</option>
+      <option value="30000">Above ₹30K</option>
+    </select>
+    <select id="placeFilter" class="border px-3 py-2 rounded" onchange="renderProperties()"></select>
+    <button onclick="resetFilters()" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded text-sm text-gray-700 font-semibold">Reset Filters</button>
+  </section>
+
+  <!-- Admin Upload Panel -->
+  <section id="adminPanel" class="p-6 hidden">
+    <h2 class="text-2xl font-bold mb-4 text-blue-900">Admin: Add New Property</h2>
+    <form id="uploadForm" class="space-y-4">
+      <input type="text" id="title" placeholder="Title" class="border p-2 w-full rounded" required />
+      <input type="number" id="price" placeholder="Price (in INR)" class="border p-2 w-full rounded" required />
+      <input type="text" id="bhk" placeholder="BHK (e.g. 2BHK)" class="border p-2 w-full rounded" required />
+      <input type="text" id="place" placeholder="Location" class="border p-2 w-full rounded" required />
+      <input type="number" id="image" placeholder="Unsplash Image ID (e.g. 1035)" class="border p-2 w-full rounded" required />
+      <textarea id="features" placeholder="Features (comma-separated)" class="border p-2 w-full rounded" rows="3"></textarea>
+      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Add Property</button>
+    </form>
+  </section>
+
+  <!-- Listings -->
+  <section id="listings" class="p-6">
+    <h2 class="text-2xl font-semibold mb-4">Available Properties</h2>
+    <div id="propertyGrid" class="grid md:grid-cols-3 gap-6"></div>
+  </section>
+
+  <!-- Footer Section: Contact, About, Map -->
+  <section class="p-6 bg-blue-50 grid md:grid-cols-3 gap-6 text-blue-900" id="contact">
+    <div>
+      <h2 class="text-xl font-bold mb-2">Contact Us</h2>
+      <p><i class="fas fa-envelope mr-2"></i>info@dreamhomes.com</p>
+      <p><i class="fas fa-phone mr-2"></i>+91-9876543210</p>
+      <p><i class="fas fa-clock mr-2"></i>Mon–Sat, 9AM – 7PM</p>
+    </div>
+    <div id="about">
+      <h2 class="text-xl font-bold mb-2">About Us</h2>
+      <p>Dream Homes is a trusted real estate platform since 2005. We offer premium properties across India, focusing on quality, transparency, and customer satisfaction.</p>
+    </div>
+    <div>
+      <h2 class="text-xl font-bold mb-2">Our Location</h2>
+      <iframe 
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3890.4145068206814!2d77.64298877501726!3d12.935363287377188!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae13cdad2e9e8f%3A0x39a32a4ecdc44b64!2sKoramangala!5e0!3m2!1sen!2sin!4v1719412345678!5m2!1sen!2sin"
+        width="100%" height="200" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+    </div>
+  </section>
+
+  <!-- Profile Modal -->
+  <div id="profileModal" class="fixed inset-0 bg-black bg-opacity-50 hidden justify-center items-center z-50">
+    <div class="bg-white p-6 rounded-xl shadow-xl w-full max-w-md relative">
+      <button onclick="closeProfileModal()" class="absolute top-3 right-3 text-gray-500 text-xl">&times;</button>
+      <h2 class="text-xl font-bold text-blue-700 mb-4">User Profile</h2>
+      <p><strong>Username:</strong> <span id="profileUsername" class="text-gray-800"></span></p>
+      <p class="mt-2 text-sm text-gray-600">Welcome to Dream Homes. You are logged in as a <span id="profileRole" class="font-semibold text-blue-600"></span>.</p>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    const loggedInUser = localStorage.getItem("loggedInUser");
+
+    let properties = JSON.parse(localStorage.getItem("properties")) || [
+      { id: 1, image: 1067, title: "Luxury Villa", price: 10000, bhk: "2BHK", place: "Bangalore", features: ["Sea View", "Pool", "Garage"] },
+      { id: 2, image: 1050, title: "City Apartment", price: 20000, bhk: "3BHK", place: "Mumbai", features: ["Gym", "Security", "Balcony"] },
+      { id: 3, image: 1041, title: "Suburban Home", price: 30000, bhk: "4BHK", place: "Chennai", features: ["Park Nearby", "Quiet"] }
+    ];
+
+    // Save defaults if first time
+    if (!localStorage.getItem("properties")) {
+      localStorage.setItem("properties", JSON.stringify(properties));
+    }
+
+    if (loggedInUser === "admin") {
+      document.getElementById("adminPanel").classList.remove("hidden");
+    }
+
+    document.getElementById("profileUsername").textContent = loggedInUser;
+    document.getElementById("profileRole").textContent = loggedInUser === "admin" ? "Site Administrator" : "Registered User";
+
+    function openProfileModal() {
+      document.getElementById("profileModal").classList.remove("hidden");
+      document.getElementById("profileModal").classList.add("flex");
+    }
+
+    function closeProfileModal() {
+      document.getElementById("profileModal").classList.add("hidden");
+      document.getElementById("profileModal").classList.remove("flex");
+    }
+
+    function formatPrice(value) {
+      if (value >= 10000000) return (value / 10000000).toFixed(1).replace(/\.0$/, "") + "Cr";
+      if (value >= 100000) return (value / 100000).toFixed(1).replace(/\.0$/, "") + "L";
+      if (value >= 1000) return (value / 1000).toFixed(1).replace(/\.0$/, "") + "K";
+      return value.toLocaleString("en-IN");
+    }
+
+    function populatePlaceFilter() {
+      const placeFilter = document.getElementById("placeFilter");
+      const uniquePlaces = [...new Set(properties.map(p => p.place))].sort();
+      placeFilter.innerHTML = `<option value="all">All Locations</option>`;
+      uniquePlaces.forEach(place => {
+        const option = document.createElement("option");
+        option.value = place;
+        option.textContent = place;
+        placeFilter.appendChild(option);
+      });
+    }
+
+    function renderProperties() {
+      const grid = document.getElementById("propertyGrid");
+      grid.innerHTML = "";
+      const bhk = document.getElementById("filter").value;
+      const price = document.getElementById("priceFilter").value;
+      const place = document.getElementById("placeFilter").value;
+
+      const filtered = properties.filter(p => {
+        const matchBHK = bhk === "all" || p.bhk === bhk;
+        let matchPrice = true;
+        if (price !== "all") {
+          const [min, max] = price.split("-").map(Number);
+          if (!isNaN(min) && isNaN(max)) matchPrice = p.price >= min;
+          else if (!isNaN(min) && !isNaN(max)) matchPrice = p.price >= min && p.price <= max;
+        }
+        const matchPlace = place === "all" || p.place === place;
+        return matchBHK && matchPrice && matchPlace;
+      });
+
+      filtered.forEach(p => {
+        const div = document.createElement("div");
+        div.className = "bg-white shadow rounded p-4 card";
+        div.innerHTML = `
+          <img src="https://unsplash.it/400/250?image=${p.image}" class="rounded mb-2 w-full h-48 object-cover">
+          <h3 class="text-lg font-bold">${p.title}</h3>
+          <p>₹${formatPrice(p.price)} - ${p.bhk}, ${p.place}</p>
+          <ul class="text-sm text-gray-600 list-disc pl-5 mt-2">
+            ${p.features.map(f => `<li>${f}</li>`).join("")}
+          </ul>
+        `;
+        grid.appendChild(div);
+      });
+    }
+
+    document.getElementById("uploadForm")?.addEventListener("submit", function(e) {
+      e.preventDefault();
+      const title = document.getElementById("title").value;
+      const price = parseInt(document.getElementById("price").value, 10);
+      const bhk = document.getElementById("bhk").value;
+      const place = document.getElementById("place").value;
+      const image = parseInt(document.getElementById("image").value, 10);
+      const features = document.getElementById("features").value.split(',').map(f => f.trim());
+
+      const newProperty = {
+        id: properties.length + 1,
+        image,
+        title,
+        price,
+        bhk,
+        place,
+        features
+      };
+
+      properties.push(newProperty);
+      localStorage.setItem("properties", JSON.stringify(properties));
+      populatePlaceFilter();
+      renderProperties();
+      alert("Property added!");
+      this.reset();
+    });
+
+    function resetFilters() {
+      document.getElementById("filter").value = "all";
+      document.getElementById("priceFilter").value = "all";
+      document.getElementById("placeFilter").value = "all";
+      renderProperties();
+    }
+
+    populatePlaceFilter();
+    renderProperties();
+  </script>
+
+</body>
+</html>
