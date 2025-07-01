@@ -1,3 +1,4 @@
+<!-- [START OF FILE] -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,13 +8,11 @@
     html {
       scroll-behavior: smooth;
     }
-
     body {
       font-family: Arial, sans-serif;
       background-color: #f9f9f9;
       margin: 0;
     }
-
     nav {
       background-color: #004080;
       color: white;
@@ -21,23 +20,19 @@
       display: flex;
       justify-content: space-between;
     }
-
     nav a {
       color: white;
       margin-left: 15px;
       text-decoration: none;
     }
-
     .container {
       padding: 20px;
     }
-
     .filters-wrapper {
       display: flex;
       justify-content: flex-end;
       margin-bottom: 20px;
     }
-
     .filters {
       display: flex;
       gap: 10px;
@@ -47,41 +42,34 @@
       border: 1px solid #ccc;
       flex-wrap: wrap;
     }
-
     .filters select,
     .filters button {
       padding: 8px;
       font-size: 14px;
     }
-
     .property-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 20px;
     }
-
     @media (max-width: 1200px) {
       .property-grid {
         grid-template-columns: repeat(3, 1fr);
       }
     }
-
     @media (max-width: 768px) {
       .property-grid {
         grid-template-columns: repeat(2, 1fr);
       }
-
       .filters-wrapper {
         justify-content: center;
       }
     }
-
     @media (max-width: 480px) {
       .property-grid {
         grid-template-columns: 1fr;
       }
     }
-
     .property-card {
       background: white;
       border: 1px solid #ddd;
@@ -89,7 +77,6 @@
       padding: 15px;
       position: relative;
     }
-
     .property-card img {
       width: 100%;
       height: 180px;
@@ -97,11 +84,9 @@
       border-radius: 6px;
       margin-bottom: 10px;
     }
-
     .property-card h3 {
       margin: 10px 0 5px;
     }
-
     .property-card button {
       margin-top: 10px;
       padding: 6px 12px;
@@ -111,7 +96,6 @@
       border-radius: 4px;
       cursor: pointer;
     }
-
     #featureModal {
       display: none;
       position: absolute;
@@ -123,16 +107,13 @@
       box-shadow: 0 4px 8px rgba(0,0,0,0.2);
       z-index: 1000;
     }
-
     #featureModal h3 {
       margin-top: 0;
     }
-
     #featureModal ul {
       margin: 10px 0 0;
       padding-left: 20px;
     }
-
     #closeModal {
       position: absolute;
       top: 5px;
@@ -144,7 +125,6 @@
       padding: 4px 8px;
       cursor: pointer;
     }
-
     .info-section {
       display: flex;
       justify-content: space-between;
@@ -153,7 +133,6 @@
       flex-wrap: wrap;
       gap: 20px;
     }
-
     #about, #contact {
       flex: 1;
       min-width: 250px;
@@ -164,17 +143,14 @@
       font-size: 13px;
       line-height: 1.3;
     }
-
     #about h2, #contact h2 {
       font-size: 16px;
       margin: 0 0 10px;
     }
-
     #about p, #contact p {
       margin: 5px 0;
       text-align: justify;
     }
-
     #backToTopBtn {
       display: none;
       position: fixed;
@@ -191,7 +167,6 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
       transition: opacity 0.3s ease;
     }
-
     #backToTopBtn:hover {
       background-color: #002f5e;
     }
@@ -235,6 +210,7 @@
     <div id="listings">
       <h2 style="margin: 10px 20px;">Listings</h2>
       <div class="property-grid" id="propertyGrid"></div>
+      <div style="text-align:center; margin-top: 20px;" id="paginationControls"></div>
     </div>
   </div>
 
@@ -263,7 +239,6 @@
       <p><strong>Email:</strong> <a href="mailto:info@dreamhomes.com">info@dreamhomes.com</a></p>
       <p><strong>Address:</strong> 123 Dream Street, Koramangala, Bangalore</p>
       <p><strong>Hours:</strong> Mon–Sat, 9AM–6PM</p>
-
       <div style="margin-top: 10px;">
         <iframe
           width="100%"
@@ -285,7 +260,7 @@
   </div>
 
   <script>
-    const properties = Array.from({ length: 20 }, (_, i) => ({
+    const properties = Array.from({ length: 36 }, (_, i) => ({
       id: i + 1,
       title: `Property ${i + 1}`,
       price: 10000 + (i % 4) * 5000,
@@ -294,6 +269,10 @@
       image: 1000 + i,
       features: ["Feature A", "Feature B", "Feature C"]
     }));
+
+    const pageSize = 12;
+    let currentPage = 1;
+    let filteredProperties = [...properties];
 
     function formatPrice(price) {
       return price.toLocaleString("en-IN");
@@ -311,15 +290,12 @@
       });
     }
 
-    function renderProperties() {
+    function applyFilters() {
       const bhkFilter = document.getElementById("bhkFilter").value;
       const priceFilter = document.getElementById("priceFilter").value;
       const placeFilter = document.getElementById("placeFilter").value;
-      const container = document.getElementById("propertyGrid");
 
-      container.innerHTML = "";
-
-      const filtered = properties.filter(p => {
+      filteredProperties = properties.filter(p => {
         const matchBHK = bhkFilter === "all" || p.bhk === bhkFilter;
         let matchPrice = true;
         if (priceFilter !== "all") {
@@ -331,7 +307,19 @@
         return matchBHK && matchPrice && matchPlace;
       });
 
-      filtered.forEach(p => {
+      currentPage = 1;
+      renderProperties();
+    }
+
+    function renderProperties() {
+      const container = document.getElementById("propertyGrid");
+      container.innerHTML = "";
+
+      const startIndex = (currentPage - 1) * pageSize;
+      const endIndex = startIndex + pageSize;
+      const currentItems = filteredProperties.slice(startIndex, endIndex);
+
+      currentItems.forEach(p => {
         const div = document.createElement("div");
         div.className = "property-card";
         div.innerHTML = `
@@ -343,6 +331,40 @@
         `;
         container.appendChild(div);
       });
+
+      renderPaginationControls();
+    }
+
+    function renderPaginationControls() {
+      const totalPages = Math.ceil(filteredProperties.length / pageSize);
+      const paginationDiv = document.getElementById("paginationControls");
+      paginationDiv.innerHTML = "";
+
+      if (totalPages <= 1) return;
+
+      const prevBtn = document.createElement("button");
+      prevBtn.textContent = "Previous";
+      prevBtn.disabled = currentPage === 1;
+      prevBtn.onclick = () => {
+        if (currentPage > 1) {
+          currentPage--;
+          renderProperties();
+        }
+      };
+
+      const nextBtn = document.createElement("button");
+      nextBtn.textContent = "Next";
+      nextBtn.disabled = currentPage === totalPages;
+      nextBtn.onclick = () => {
+        if (currentPage < totalPages) {
+          currentPage++;
+          renderProperties();
+        }
+      };
+
+      paginationDiv.appendChild(prevBtn);
+      paginationDiv.appendChild(document.createTextNode(` Page ${currentPage} of ${totalPages} `));
+      paginationDiv.appendChild(nextBtn);
     }
 
     function showFeatures(property, event) {
@@ -398,7 +420,7 @@
       document.getElementById("bhkFilter").value = "all";
       document.getElementById("priceFilter").value = "all";
       document.getElementById("placeFilter").value = "all";
-      renderProperties();
+      applyFilters();
     }
 
     window.onscroll = function () {
@@ -411,11 +433,12 @@
     };
 
     populatePlaceFilter();
-    renderProperties();
+    applyFilters();
 
-    document.getElementById("bhkFilter").addEventListener("change", renderProperties);
-    document.getElementById("priceFilter").addEventListener("change", renderProperties);
-    document.getElementById("placeFilter").addEventListener("change", renderProperties);
+    document.getElementById("bhkFilter").addEventListener("change", applyFilters);
+    document.getElementById("priceFilter").addEventListener("change", applyFilters);
+    document.getElementById("placeFilter").addEventListener("change", applyFilters);
   </script>
 </body>
 </html>
+<!-- [END OF FILE] -->
