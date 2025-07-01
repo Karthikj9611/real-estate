@@ -1,101 +1,19 @@
-<!-- [START OF FILE] -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dream Homes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
   <style>
     html {
       scroll-behavior: smooth;
     }
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f9f9f9;
-      margin: 0;
-    }
-    nav {
-      background-color: #004080;
-      color: white;
-      padding: 15px;
-      display: flex;
-      justify-content: space-between;
-    }
-    nav a {
-      color: white;
-      margin-left: 15px;
-      text-decoration: none;
-    }
-    .container {
-      padding: 20px;
-    }
-    .filters-wrapper {
-      display: flex;
-      justify-content: flex-end;
-      margin-bottom: 20px;
-    }
-    .filters {
-      display: flex;
-      gap: 10px;
-      background-color: #fff;
-      padding: 10px 20px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      flex-wrap: wrap;
-    }
-    .filters select,
-    .filters button {
-      padding: 8px;
-      font-size: 14px;
-    }
-    .property-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 20px;
-    }
-    @media (max-width: 1200px) {
-      .property-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
-    }
-    @media (max-width: 768px) {
-      .property-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      .filters-wrapper {
-        justify-content: center;
-      }
-    }
-    @media (max-width: 480px) {
-      .property-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-    .property-card {
-      background: white;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 15px;
-      position: relative;
-    }
-    .property-card img {
-      width: 100%;
-      height: 180px;
-      object-fit: cover;
-      border-radius: 6px;
-      margin-bottom: 10px;
-    }
-    .property-card h3 {
-      margin: 10px 0 5px;
-    }
-    .property-card button {
-      margin-top: 10px;
-      padding: 6px 12px;
-      background-color: #004080;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
+    .card:hover {
+      transform: translateY(-4px);
+      transition: transform 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
     #featureModal {
       display: none;
@@ -126,32 +44,6 @@
       padding: 4px 8px;
       cursor: pointer;
     }
-    .info-section {
-      display: flex;
-      justify-content: space-between;
-      padding: 20px;
-      background: #fdfdfd;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
-    #about, #contact {
-      flex: 1;
-      min-width: 250px;
-      padding: 10px 15px;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.05);
-      font-size: 13px;
-      line-height: 1.3;
-    }
-    #about h2, #contact h2 {
-      font-size: 16px;
-      margin: 0 0 10px;
-    }
-    #about p, #contact p {
-      margin: 5px 0;
-      text-align: justify;
-    }
     #backToTopBtn {
       display: none;
       position: fixed;
@@ -173,47 +65,43 @@
     }
   </style>
 </head>
-<body>
+<body class="bg-gray-50">
 
   <!-- Navbar -->
-  <nav>
-    <div><strong>Dream Homes</strong></div>
-    <div>
-      <a href="#listings">Listings</a>
-      <a href="#contact">Contact</a>
-      <a href="#about">About</a>
-      <a href="logout.html">Logout</a>
+  <nav class="bg-blue-700 text-white p-4 flex justify-between items-center">
+    <h1 class="text-xl font-bold">Dream Homes</h1>
+    <div class="space-x-4">
+      <a href="#listings" class="hover:underline">Listings</a>
+      <a href="#contact" class="hover:underline">Contact</a>
+      <a href="#about" class="hover:underline">About Us</a>
+      <a href="logout.html" class="bg-red-500 px-3 py-1 rounded">Logout</a>
     </div>
   </nav>
 
   <!-- Filters -->
-  <div class="container">
-    <div class="filters-wrapper">
-      <div class="filters">
-        <select id="bhkFilter">
-          <option value="all">All BHK</option>
-          <option value="2BHK">2BHK</option>
-          <option value="3BHK">3BHK</option>
-          <option value="4BHK">4BHK</option>
-        </select>
-        <select id="priceFilter">
-          <option value="all">All Prices</option>
-          <option value="0-15000">Below ₹15K</option>
-          <option value="15000-25000">₹15K–₹25K</option>
-          <option value="25000">Above ₹25K</option>
-        </select>
-        <select id="placeFilter"></select>
-        <button onclick="resetFilters()">Reset</button>
-      </div>
-    </div>
+  <section class="p-4 flex flex-wrap justify-end space-x-4 items-center">
+    <select id="bhkFilter" class="border px-3 py-2 rounded" onchange="applyFilters()">
+      <option value="all">All BHK</option>
+      <option value="2BHK">2BHK</option>
+      <option value="3BHK">3BHK</option>
+      <option value="4BHK">4BHK</option>
+    </select>
+    <select id="priceFilter" class="border px-3 py-2 rounded" onchange="applyFilters()">
+      <option value="all">All Prices</option>
+      <option value="0-15000">Below ₹15K</option>
+      <option value="15000-25000">₹15K – ₹25K</option>
+      <option value="25000">Above ₹25K</option>
+    </select>
+    <select id="placeFilter" class="border px-3 py-2 rounded" onchange="applyFilters()"></select>
+    <button onclick="resetFilters()" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded text-sm text-gray-700 font-semibold">Reset Filters</button>
+  </section>
 
-    <!-- Listings Section -->
-    <div id="listings">
-      <h2 style="margin: 10px 20px;">Listings</h2>
-      <div class="property-grid" id="propertyGrid"></div>
-      <div style="text-align:center; margin-top: 20px;" id="paginationControls"></div>
-    </div>
-  </div>
+  <!-- Listings Section -->
+  <section id="listings" class="p-6">
+    <h2 class="text-2xl font-semibold mb-4">Available Properties</h2>
+    <div id="propertyGrid" class="grid md:grid-cols-3 gap-6"></div>
+    <div class="text-center mt-6" id="paginationControls"></div>
+  </section>
 
   <!-- Feature Modal -->
   <div id="featureModal">
@@ -226,39 +114,40 @@
   <button id="backToTopBtn" title="Go to top">↑ Top</button>
 
   <!-- About & Contact -->
-  <div class="info-section">
+  <section class="p-6 bg-blue-50 grid md:grid-cols-2 gap-6 text-blue-900">
     <div id="about">
-      <h2>About Us</h2>
+      <h2 class="text-xl font-bold mb-2">About Us</h2>
       <p>Welcome to Dream Homes – your trusted partner in finding the perfect place to call home.</p>
       <p>Our mission is to provide exceptional real estate listings that connect buyers with dream properties across India.</p>
-      <p>Whether you're searching for a cozy apartment, a luxury villa, or a family-friendly suburban home, we’ve got you covered.</p>
+      <p>Whether you're searching for a cozy apartment, a luxury villa, or a family-friendly suburban home, we've got you covered.</p>
     </div>
 
     <div id="contact">
-      <h2>Contact Us</h2>
-      <p><strong>Phone:</strong> <a href="tel:+919876543210">+91-9876543210</a></p>
-      <p><strong>Email:</strong> <a href="mailto:info@dreamhomes.com">info@dreamhomes.com</a></p>
-      <p><strong>Address:</strong> 123 Dream Street, Koramangala, Bangalore</p>
-      <p><strong>Hours:</strong> Mon–Sat, 9AM–6PM</p>
-      <div style="margin-top: 10px;">
+      <h2 class="text-xl font-bold mb-2">Contact Us</h2>
+      <p><i class="fas fa-phone mr-2"></i><a href="tel:+919876543210">+91-9876543210</a></p>
+      <p><i class="fas fa-envelope mr-2"></i><a href="mailto:info@dreamhomes.com">info@dreamhomes.com</a></p>
+      <p><i class="fas fa-map-marker-alt mr-2"></i>123 Dream Street, Koramangala, Bangalore</p>
+      <p><i class="fas fa-clock mr-2"></i>Mon–Sat, 9AM–6PM</p>
+      <div class="mt-4">
         <iframe
           width="100%"
           height="160"
           loading="lazy"
           allowfullscreen
           referrerpolicy="no-referrer-when-downgrade"
-          src="https://www.google.com/maps?q=Koramangala+Bangalore&output=embed">
+          src="https://www.google.com/maps?q=Koramangala+Bangalore&output=embed"
+          class="rounded">
         </iframe>
-        <p style="margin-top:6px;">
+        <p class="mt-2">
           <a href="https://www.google.com/maps/dir/?api=1&destination=Koramangala+Bangalore"
              target="_blank"
-             style="color: #004080; text-decoration: underline;">
+             class="text-blue-700 underline">
             Open in Google Maps
           </a>
         </p>
       </div>
     </div>
-  </div>
+  </section>
 
   <script>
     const properties = Array.from({ length: 36 }, (_, i) => ({
@@ -322,13 +211,12 @@
 
       currentItems.forEach(p => {
         const div = document.createElement("div");
-        div.className = "property-card";
+        div.className = "bg-white shadow rounded p-4 card";
         div.innerHTML = `
-          <img src="https://unsplash.it/400/250?image=${p.image}" alt="${p.title}">
-          <h3>${p.title}</h3>
-          <p>${p.bhk}, ${p.place}</p>
-          <p>₹${formatPrice(p.price)}</p>
-          <button onclick='showFeatures(${JSON.stringify(p)}, event)'>View Details</button>
+          <img src="https://unsplash.it/400/250?image=${p.image}" class="rounded mb-2 w-full h-48 object-cover">
+          <h3 class="text-lg font-bold">${p.title}</h3>
+          <p>₹${formatPrice(p.price)} - ${p.bhk}, ${p.place}</p>
+          <button onclick='showFeatures(${JSON.stringify(p)}, event)' class="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">View Details</button>
         `;
         container.appendChild(div);
       });
@@ -345,6 +233,7 @@
 
       const prevBtn = document.createElement("button");
       prevBtn.textContent = "Previous";
+      prevBtn.className = "bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded mx-1";
       prevBtn.disabled = currentPage === 1;
       prevBtn.onclick = () => {
         if (currentPage > 1) {
@@ -355,6 +244,7 @@
 
       const nextBtn = document.createElement("button");
       nextBtn.textContent = "Next";
+      nextBtn.className = "bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded mx-1";
       nextBtn.disabled = currentPage === totalPages;
       nextBtn.onclick = () => {
         if (currentPage < totalPages) {
@@ -435,11 +325,6 @@
 
     populatePlaceFilter();
     applyFilters();
-
-    document.getElementById("bhkFilter").addEventListener("change", applyFilters);
-    document.getElementById("priceFilter").addEventListener("change", applyFilters);
-    document.getElementById("placeFilter").addEventListener("change", applyFilters);
   </script>
 </body>
 </html>
-<!-- [END OF FILE] -->
