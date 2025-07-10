@@ -372,11 +372,13 @@ select:focus {
 
   <div class="property-list" id="propertyList"></div>
 
+<!--
   <div class="pagination">
     <button onclick="changePage(-1)" id="prevBtn">Previous</button>
     <span id="pageInfo">Page 1</span>
     <button onclick="changePage(1)" id="nextBtn">Next</button>
   </div>
+-->  
 </div>
 
 <!-- 👇 Container where About and Contact toggle -->
@@ -605,108 +607,106 @@ function populateAreaDropdown(properties) {
   let currentPage = 1;
   const itemsPerPage = 8;
 
-  function renderProperties() {
-	  const list = document.getElementById("propertyList");
-	  const pagination = document.querySelector(".pagination");
-	  list.innerHTML = "";
+function renderProperties() {
+  const list = document.getElementById("propertyList");
+  const pagination = document.querySelector(".pagination");
+  list.innerHTML = "";
 
-	  const filtered = applyFilters();
-	  const totalPages = Math.ceil(filtered.length / itemsPerPage);
-	  currentPage = Math.max(1, Math.min(currentPage, totalPages));
+  const filtered = applyFilters();
 
-	  // Update total count
-	  document.getElementById("totalCount").textContent = `(${filtered.length} Results)`;
+  // Update total count
+  document.getElementById("totalCount").textContent = `(${filtered.length} Results)`;
 
-	  // Handle no properties
-	  if (filtered.length === 0) {
-	    list.innerHTML = `
-	      <div class="no-properties-msg">
-	        ⚠️ No properties found matching your criteria.
-	      </div>
-	    `;
-	    pagination.style.display = "none";
-	    return;
-	  } else {
-	    pagination.style.display = "block";
-	  }
+  // Handle no properties
+  if (filtered.length === 0) {
+    list.innerHTML = `
+      <div class="no-properties-msg">
+        ⚠️ No properties found matching your criteria.
+      </div>
+    `;
+    // pagination.style.display = "none"; // Hide pagination if no results
+    return;
+  } else {
+    // pagination.style.display = "block";
+  }
 
-	  // Slice for current page
-	  const start = (currentPage - 1) * itemsPerPage;
-	  const pageItems = filtered.slice(start, start + itemsPerPage);
+  // ✅ Show all filtered properties (no slicing)
+  const pageItems = filtered;
 
-	  // Render cards
-	  pageItems.forEach(p => {
-	    const card = document.createElement("div");
-	    card.className = "property-card";
-	    card.setAttribute("data-images", JSON.stringify(p.images));
-	    card.setAttribute("data-downpayment", p.downpayment);
-	    card.setAttribute("data-furnishing", p.furnishing);
-	    card.setAttribute("data-toilet", p.toilet);
-	    card.setAttribute("data-area", p.area);
-	    card.setAttribute("data-floor", p.floor);
-	    card.setAttribute("data-parking", p.parking);
+  // Render property cards
+  pageItems.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "property-card";
+    card.setAttribute("data-images", JSON.stringify(p.images));
+    card.setAttribute("data-downpayment", p.downpayment);
+    card.setAttribute("data-furnishing", p.furnishing);
+    card.setAttribute("data-toilet", p.toilet);
+    card.setAttribute("data-area", p.area);
+    card.setAttribute("data-floor", p.floor);
+    card.setAttribute("data-parking", p.parking);
 
-	    card.innerHTML = `
-	      <div class="image-carousel">
-	        <img src="${p.images[0]}" class="carousel-img" data-index="0" alt="Property Image" />
-	      </div>
-	      <div class="carousel-dots">
-	        ${p.images.map((_, i) => `<span class="carousel-dot ${i === 0 ? 'active' : ''}" onclick="goToImage(this, ${i})"></span>`).join('')}
-	      </div>
-	      <h3>${p.title}</h3>
-	      <p><strong>Price:</strong> ₹${formatIndianNumber(Number(p.price))}</p>
-	      <div class="action-buttons">
-  <button onclick="showDetails(this)"><i class="fas fa-eye"></i> View Details</button>
-  <button onclick="showFullImages(this)"><i class="fas fa-image"></i> View Full Images</button>
-</div>
+    card.innerHTML = `
+      <div class="image-carousel">
+        <img src="${p.images[0]}" class="carousel-img" data-index="0" alt="Property Image" />
+      </div>
+      <div class="carousel-dots">
+        ${p.images.map((_, i) => `<span class="carousel-dot ${i === 0 ? 'active' : ''}" onclick="goToImage(this, ${i})"></span>`).join('')}
+      </div>
+      <h3>${p.title}</h3>
+      <p><strong>Price:</strong> ₹${formatIndianNumber(Number(p.price))}</p>
+      <div class="action-buttons">
+        <button onclick="showDetails(this)"><i class="fas fa-eye"></i> View Details</button>
+        <button onclick="showFullImages(this)"><i class="fas fa-image"></i> View Full Images</button>
+      </div>
+    `;
 
-	    `;
+    list.appendChild(card);
+  });
 
-	    list.appendChild(card);
-	  });
+  /*
+  // 🔒 Pagination UI - COMMENTED OUT
+  pagination.innerHTML = "";
 
-	  // Clear and rebuild pagination
-	  pagination.innerHTML = "";
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
+  currentPage = Math.max(1, Math.min(currentPage, totalPages));
 
-	  // Previous Button
-	  const prevBtn = document.createElement("button");
-	  prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
-	  prevBtn.disabled = currentPage === 1;
-	  prevBtn.onclick = () => changePage(-1);
-	  pagination.appendChild(prevBtn);
+  const prevBtn = document.createElement("button");
+  prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+  prevBtn.disabled = currentPage === 1;
+  prevBtn.onclick = () => changePage(-1);
+  pagination.appendChild(prevBtn);
 
-	  // Page Info
-	  const pageInfo = document.createElement("span");
-	  pageInfo.id = "pageInfo";
-	  pageInfo.style.margin = "0 10px";
-	  pageInfo.style.fontWeight = "600";
-	  pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-	  pagination.appendChild(pageInfo);
+  const pageInfo = document.createElement("span");
+  pageInfo.id = "pageInfo";
+  pageInfo.style.margin = "0 10px";
+  pageInfo.style.fontWeight = "600";
+  pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+  pagination.appendChild(pageInfo);
 
-	  // Page Number Buttons
-	  for (let i = 1; i <= totalPages; i++) {
-	    const pageBtn = document.createElement("button");
-	    pageBtn.textContent = i;
-	    if (i === currentPage) {
-	      pageBtn.classList.add("active-page");
-	    }
-	    pageBtn.onclick = () => {
-	      currentPage = i;
-	      renderProperties();
-	    };
-	    pagination.appendChild(pageBtn);
-	  }
+  for (let i = 1; i <= totalPages; i++) {
+    const pageBtn = document.createElement("button");
+    pageBtn.textContent = i;
+    if (i === currentPage) {
+      pageBtn.classList.add("active-page");
+    }
+    pageBtn.onclick = () => {
+      currentPage = i;
+      renderProperties();
+    };
+    pagination.appendChild(pageBtn);
+  }
 
-	  // Next Button
-	  const nextBtn = document.createElement("button");
-	  nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
-	  nextBtn.disabled = currentPage === totalPages;
-	  nextBtn.onclick = () => changePage(1);
-	  pagination.appendChild(nextBtn);
+  const nextBtn = document.createElement("button");
+  nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+  nextBtn.disabled = currentPage === totalPages;
+  nextBtn.onclick = () => changePage(1);
+  pagination.appendChild(nextBtn);
+  */
 
-	  // Scroll to top of listings
-	  document.getElementById("listings").scrollIntoView({ behavior: "smooth" });
-	}
+  // Scroll to top of listings
+  document.getElementById("listings").scrollIntoView({ behavior: "smooth" });
+}
+
 
 
 
