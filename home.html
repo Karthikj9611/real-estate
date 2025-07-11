@@ -1030,11 +1030,12 @@ function showFullImages(button) {
   currentImageList = JSON.parse(card.dataset.images);
   imageModalIndex = parseInt(imgElement.dataset.index) || 0;
 
-  document.querySelectorAll(".property-card button:nth-of-type(1)").forEach(btn => {
-    btn.disabled = true;
-    btn.style.opacity = "0.5";
-    btn.style.cursor = "not-allowed";
-  });
+	  // Disable ALL "View Details" buttons
+/* 	  document.querySelectorAll(".property-card button:nth-of-type(1)").forEach(btn => {
+	    btn.disabled = true;
+	    btn.style.opacity = "0.5";
+	    btn.style.cursor = "not-allowed";
+	  }); */
 
   document.getElementById("fullImage").src = currentImageList[imageModalIndex];
   updateImageCountLabel();
