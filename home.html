@@ -434,7 +434,26 @@ select:focus {
 
 <div class="modal" id="detailsModal">
 <div class="modal-content">
-  <span class="close-icon" onclick="closeModal()">×</span>
+  <span class="close-icon" onclick="closeModal()" style="
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 24px;
+  color: #e53935;
+  cursor: pointer;
+  font-weight: bold;
+  z-index: 101;
+  background: white;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  transition: background-color 0.3s ease;
+">×</span>
+
   <h3 id="modalTitle"></h3>
   <p id="modalDown"><i class="fas fa-money-bill-wave"></i> </p>
   <p id="modalFurnishing"><i class="fas fa-couch"></i> </p>
@@ -668,7 +687,7 @@ function renderProperties() {
 
     card.innerHTML = `
       <div class="image-carousel">
-        <img src="${p.images[0]}" class="carousel-img" data-index="0" alt="Property Image" />
+        <img src="${p.images[0]}" class="carousel-img" data-index="0" alt="Property Image" onclick="showFullImagesFromImage(this)" />
       </div>
       <div class="carousel-dots">
         ${p.images.map((_, i) => `<span class="carousel-dot ${i === 0 ? 'active' : ''}" onclick="goToImage(this, ${i})"></span>`).join('')}
@@ -677,7 +696,7 @@ function renderProperties() {
       <p><strong>Price:</strong> ₹${formatIndianNumber(Number(p.price))}</p>
       <div class="action-buttons">
         <button onclick="showDetails(this)"><i class="fas fa-eye"></i> View Details</button>
-        <button onclick="showFullImages(this)"><i class="fas fa-image"></i> View Full Images</button>
+<!--        <button onclick="showFullImages(this)"><i class="fas fa-image"></i> View Full Images</button> -->
       </div>
     `;
 
@@ -854,9 +873,9 @@ function renderProperties() {
     modal.style.visibility = "visible";
 
     clearTimeout(modalTimeout);
-    modalTimeout = setTimeout(() => {
-      closeModal();
-    }, 3000);
+//    modalTimeout = setTimeout(() => {
+//      closeModal();
+//    }, 3000);
   });
 }
 
@@ -1005,6 +1024,34 @@ function showFullImages(button) {
 	function scrollToTop() {
 	  window.scrollTo({ top: 0, behavior: "smooth" });
 	}
+	
+	function showFullImagesFromImage(imgElement) {
+  const card = imgElement.closest(".property-card");
+  currentImageList = JSON.parse(card.dataset.images);
+  imageModalIndex = parseInt(imgElement.dataset.index) || 0;
+
+  document.querySelectorAll(".property-card button:nth-of-type(1)").forEach(btn => {
+    btn.disabled = true;
+    btn.style.opacity = "0.5";
+    btn.style.cursor = "not-allowed";
+  });
+
+  document.getElementById("fullImage").src = currentImageList[imageModalIndex];
+  updateImageCountLabel();
+
+  const modal = document.getElementById("imageModal");
+  modal.style.display = "block";
+  modal.style.position = "fixed";
+  modal.style.top = "15%";
+  modal.style.left = "50%";
+  modal.style.transform = "translateX(-50%)";
+
+  clearTimeout(imageModalTimeout);
+  imageModalTimeout = setTimeout(() => {
+    closeImageModal();
+  }, 3000);
+}
+
 
 	
 </script>
