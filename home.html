@@ -8,27 +8,27 @@
   <style>
     * { box-sizing: border-box; }
     
-    #backToTopBtn {
-  display: none; /* Hidden by default */
+#backToTopBtn {
+  display: block; /* Always visible */
   position: fixed;
-  bottom: 30px;
-  right: 30px;
+  bottom: 15px;   /* Closer to bottom */
+  right: 15px;    /* Closer to right edge */
   z-index: 100;
-  font-size: 14px;
+  font-size: 12px; /* Smaller text */
   border: none;
   outline: none;
   background-color: #1976d2;
   color: white;
   cursor: pointer;
-  padding: 10px 16px;
-  border-radius: 8px;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+  padding: 6px 10px; /* Smaller button size */
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
   transition: opacity 0.3s ease;
 }
-
 #backToTopBtn:hover {
   background-color: #1565c0;
 }
+
     
 	
     body {
@@ -1007,19 +1007,7 @@ function showFullImages(button) {
     }, 3000);
   }
   
-  window.addEventListener("scroll", () => {
-	  const btn = document.getElementById("backToTopBtn");
-	  const scrollY = window.scrollY || document.documentElement.scrollTop;
-	  const pageHeight = document.documentElement.scrollHeight;
-	  const viewportHeight = window.innerHeight;
-
-	  // Show button near bottom (e.g. 300px from bottom)
-	  if (scrollY + viewportHeight >= pageHeight - 300) {
-	    btn.style.display = "block";
-	  } else {
-	    btn.style.display = "none";
-	  }
-	});
+  
 
 	function scrollToTop() {
 	  window.scrollTo({ top: 0, behavior: "smooth" });
